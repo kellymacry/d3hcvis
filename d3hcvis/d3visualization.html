@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Lung Cancer Patient Outcomes Visualization</title>
+  <!-- Include D3.js library -->
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+</head>
+<body>
+  <div id="durationHistogram"></div>
+  <div id="lengthOfStayHistogram"></div>
+  <div id="incomeHistogram"></div>
+  <!-- Create a container for the visualization -->
+    <script>
+     const patientData = [
+  { patientId: 1, outcome: "Survived", duration: 24, tumorType: "Adenocarcinoma", lengthOfStay: 7, income: 40000 },
+  { patientId: 2, outcome: "Survived", duration: 36, tumorType: "Squamous Cell Carcinoma", lengthOfStay: 5, income: 25000 },
+  { patientId: 3, outcome: "Deceased", duration: 12, tumorType: "Small Cell Lung Cancer", lengthOfStay: 10, income: 15000 },
+  { patientId: 4, outcome: "Survived", duration: 18, tumorType: "Adenocarcinoma", lengthOfStay: 4, income: 30000 },
+  { patientId: 5, outcome: "Deceased", duration: 30, tumorType: "Squamous Cell Carcinoma", lengthOfStay: 8, income: 18000 },
+  // Add more patient data as needed...
+];
+   
+       // Select the container element
+// Use d3.csv() to fetch and parse the CSV data
+d3.csv("patientdata.csv").then(function (data) {
+  // Create histograms for "duration," "lengthOfStay," and "income" attributes
+  createHistogram(data, "duration", "Duration of Cancer (months)", "#durationHistogram");
+  createHistogram(data, "lengthOfStay", "Length of Stay (days)", "#lengthOfStayHistogram");
+  createHistogram(data, "income", "Income", "#incomeHistogram");
+});
+
+// Function to create a histogram
+function createHistogram(data, attribute, label, containerId) {
+  const values = data.map(d => Number(d[attribute]));
+
+  // Set up scales and bins for the histogram
+  const width = 500;
+  const height = 200;
+  const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+  const xScale = d3.scaleLinear()
+    .domain([d3.min(values), d3.max(values)])
+    .range([margin.left, width - margin.right]);
+
+  const bins = d3.histogram()
+    .domain(xScale.domain())
+    .thresholds(xScale.ticks(10))
+    (values);
+
+  const yScale = d3.scaleLinear()
+    .domain([0, d3.max(bins, d => d.length)])
+    .range([height - margin.bottom, margin.top]);
+
+  // Append an SVG element for the histogram
+  const svg = d3.select(containerId)
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+  // Append bars to the SVG for each bin
+  svg.selectAll("rect")
+    .data(bins)
+    .enter()
+    .append("rect")
+    .attr("x", d => xScale(d.x0))
+    .attr("width", d => xScale(d.x1) - xScale(d.x0) - 1)
+    .attr("y", d => yScale(d.length))
+    .attr("height", d => height - margin.bottom - yScale(d.length))
+    .attr("fill", "steelblue");
+
+  // Append labels for the histogram
+  svg.append("text")
+    .attr("x", width / 2)
+    .attr("y", height - 5)
+    .attr("text-anchor", "middle")
+    .text(label);
+
+  // Append labels for the axes
+  svg.append("g")
+    .call(d3.axisBottom(xScale).ticks(10))
+    .attr("transform", `translate(0,${height - margin.bottom})`);
+
+  svg.append("g")
+    .call(d3.axisLeft(yScale).ticks(5))
+    .attr("transform", `translate(${margin.left},0)`);
+}
+    </script>
+</body>
+</html>

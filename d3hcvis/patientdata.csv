@@ -1,0 +1,6 @@
+"patientId,outcome,duration,tumorType,lengthOfStay,income
+1,Survived,24,Adenocarcinoma,7,40000
+2,Survived,36,Squamous Cell Carcinoma,5,25000
+3,Deceased,12,Small Cell Lung Cancer,10,15000
+4,Survived,18,Adenocarcinoma,4,30000
+5,Deceased,30,Squamous Cell Carcinoma,8,18000"
